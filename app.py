@@ -174,12 +174,6 @@ if st.session_state.feedback_data:
         mime="text/csv",
         type="secondary"
     )
-    
-    # Option to clear all feedback
-    # if st.button("⚠️ Clear All Feedback", help="This will delete all collected feedback"):
-    #     st.session_state.feedback_data = []
-    #     st.success("All feedback cleared!")
-    #     st.rerun()
 
 else:
     st.info("No feedback collected yet. Start reviewing patents!")
