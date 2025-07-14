@@ -5,15 +5,27 @@ import os
 # Configure page
 st.set_page_config(page_title="Patent Validation Tool", layout="wide")
 
-def load_data():
+@st.cache_data(max_entries=1)
+def fetch_base_data():
+    """Load raw data once"""
     try:
         descriptions = pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', 
-                                 sep='\t', compression='zip', nrows=1000)  # Limit rows
+                                 sep='\t', compression='zip')
         crosswalk = pd.read_csv('data/crosswalk.csv')
+        return descriptions, crosswalk
+    except FileNotFoundError as e:
+        st.error(f"Data files not found: {e}")
+        st.error("Please ensure 'pg_detail_desc_text_2001.tsv.zip' and 'crosswalk.csv' are in the repository root.")
+        st.stop()
     except Exception as e:
         st.error(f"Error loading data: {e}")
         st.stop()
-    return descriptions, crosswalk
+
+def get_merged_data():
+    """Transform data without caching (since it's fast)"""
+    descriptions, crosswalk = fetch_base_data()
+    data = pd.merge(descriptions, crosswalk, left_on='pgpub_id', right_on="patent_id", how="inner")
+    return data.drop(['pgpub_id', 'description_length'], axis=1)
 
 # Initialize session state for feedback storage
 if 'feedback_data' not in st.session_state:
@@ -21,11 +33,7 @@ if 'feedback_data' not in st.session_state:
 
 # Load data
 with st.spinner("Loading data..."):
-    descriptions, crosswalk = load_data()
-
-# Merge data
-data = pd.merge(descriptions, crosswalk, left_on='pgpub_id', right_on="patent_id", how="inner")
-data = data.drop(['pgpub_id', 'description_length'], axis=1)
+    data = get_merged_data()
 
 # Check if data is loaded successfully
 if data.empty:
