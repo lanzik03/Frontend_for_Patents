@@ -64,6 +64,7 @@ with col1:
     st.subheader("Description")
     st.write(row["description_text"])
 
+# TODO: Add Title and Abstract of the patent
 # with col2:
 #     st.subheader("Patent Info")
 #     st.write(f"**Patent ID:** {row['patent_id']}")
