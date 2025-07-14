@@ -10,8 +10,8 @@ def load_data():
     """Load data with error handling for deployment"""
     try:
         # Try current directory first
-        descriptions = pd.read_csv('Data/pg_detail_desc_text_2001.tsv.zip', sep='\t', compression='zip')
-        crosswalk = pd.read_csv('Data/crosswalk.csv')
+        descriptions = pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', sep='\t', compression='zip')
+        crosswalk = pd.read_csv('data/crosswalk.csv')
     except FileNotFoundError as e:
         st.error(f"Data files not found: {e}")
         st.error("Please ensure 'pg_detail_desc_text_2001.tsv.zip' and 'crosswalk.csv' are in the repository root.")
