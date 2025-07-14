@@ -7,19 +7,20 @@ st.set_page_config(page_title="Patent Validation Tool", layout="wide")
 
 @st.cache_data
 def load_data():
-    """Load data with error handling for deployment"""
     try:
-        # Try current directory first
-        descriptions = pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', sep='\t', compression='zip')
+        # Load in chunks to reduce memory usage
+        chunks = []
+        for chunk in pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', 
+                               sep='\t', compression='zip', chunksize=1000):
+            chunks.append(chunk)
+            if len(chunks) >= 10:  # Limit for deployment
+                break
+        
+        descriptions = pd.concat(chunks, ignore_index=True)
         crosswalk = pd.read_csv('data/crosswalk.csv')
-    except FileNotFoundError as e:
-        st.error(f"Data files not found: {e}")
-        st.error("Please ensure 'pg_detail_desc_text_2001.tsv.zip' and 'crosswalk.csv' are in the repository root.")
-        st.stop()
     except Exception as e:
         st.error(f"Error loading data: {e}")
         st.stop()
-    
     return descriptions, crosswalk
 
 # Initialize session state for feedback storage
