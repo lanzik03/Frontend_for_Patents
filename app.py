@@ -10,7 +10,7 @@ def fetch_base_data():
     """Load raw data once"""
     try:
         descriptions = pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', 
-                                 sep='\t', compression='zip', nrows=5000)
+                                 sep='\t', compression='zip', nrows=10000)
         crosswalk = pd.read_csv('data/crosswalk.csv')
         return descriptions, crosswalk
     except FileNotFoundError as e:
