@@ -5,11 +5,10 @@ import os
 # Configure page
 st.set_page_config(page_title="Patent Validation Tool", layout="wide")
 
-@st.cache_data(max_entries=1)  # Only cache one version
 def load_data():
     try:
         descriptions = pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', 
-                                 sep='\t', compression='zip')
+                                 sep='\t', compression='zip', nrows=50000)  # Limit rows
         crosswalk = pd.read_csv('data/crosswalk.csv')
     except Exception as e:
         st.error(f"Error loading data: {e}")
