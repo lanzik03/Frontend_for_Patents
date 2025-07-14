@@ -11,7 +11,7 @@ def load_data():
         # Load in chunks to reduce memory usage
         chunks = []
         for chunk in pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', 
-                               sep='\t', compression='zip', chunksize=1000):
+                               sep='\t', compression='zip', chunksize=100):
             chunks.append(chunk)
             if len(chunks) >= 10:  # Limit for deployment
                 break
