@@ -9,18 +9,41 @@ st.set_page_config(page_title="Patent Validation Tool", layout="wide")
 def load_data():
     """Load data with error handling for deployment"""
     try:
-        # Try current directory first
+        # Try to load real data files first
         descriptions = pd.read_csv('data/pg_detail_desc_text_2001.tsv.zip', sep='\t', compression='zip')
         crosswalk = pd.read_csv('data/crosswalk.csv')
-    except FileNotFoundError as e:
-        st.error(f"Data files not found: {e}")
-        st.error("Please ensure 'pg_detail_desc_text_2001.tsv.zip' and 'crosswalk.csv' are in the repository root.")
-        st.stop()
+        return descriptions, crosswalk
+    except FileNotFoundError:
+        # If real data files don't exist, create sample data
+        st.warning("Data files not found. Using sample data for demonstration.")
+        
+        # Create sample descriptions data
+        descriptions = pd.DataFrame({
+            'pgpub_id': ['US20010001', 'US20010002', 'US20010003', 'US20010004', 'US20010005'],
+            'description_text': [
+                'A novel method for improving semiconductor manufacturing processes using advanced lithography techniques.',
+                'An innovative approach to wireless communication systems utilizing millimeter wave technology.',
+                'A pharmaceutical composition for treating cardiovascular diseases with improved bioavailability.',
+                'A machine learning algorithm for predictive maintenance in industrial equipment.',
+                'A sustainable energy storage system based on advanced battery chemistry.'
+            ]
+        })
+        
+        # Create sample crosswalk data
+        crosswalk = pd.DataFrame({
+            'patent_id': ['US20010001', 'US20010002', 'US20010003', 'US20010004', 'US20010005'],
+            'top1_industry_title': ['Semiconductor Manufacturing', 'Telecommunications', 'Pharmaceuticals', 'Industrial Automation', 'Energy Storage'],
+            'top1_similarity': [0.89, 0.92, 0.85, 0.88, 0.91],
+            'top2_industry_title': ['Electronics', 'Wireless Technology', 'Biotechnology', 'Software Development', 'Renewable Energy'],
+            'top2_similarity': [0.76, 0.84, 0.79, 0.82, 0.87],
+            'top3_industry_title': ['Materials Science', 'Signal Processing', 'Medical Devices', 'Data Analytics', 'Chemical Engineering'],
+            'top3_similarity': [0.68, 0.77, 0.71, 0.75, 0.83]
+        })
+        
+        return descriptions, crosswalk
     except Exception as e:
         st.error(f"Error loading data: {e}")
         st.stop()
-    
-    return descriptions, crosswalk
 
 # Initialize session state for feedback storage
 if 'feedback_data' not in st.session_state:
@@ -32,7 +55,7 @@ with st.spinner("Loading data..."):
 
 # Merge data
 data = pd.merge(descriptions, crosswalk, left_on='pgpub_id', right_on="patent_id", how="inner")
-data = data.drop(['pgpub_id', 'description_length'], axis=1)
+data = data.drop(['pgpub_id'], axis=1, errors='ignore')  # Added errors='ignore' for missing columns
 
 # Check if data is loaded successfully
 if data.empty:
@@ -173,12 +196,6 @@ if st.session_state.feedback_data:
         mime="text/csv",
         type="secondary"
     )
-    
-    # Option to clear all feedback
-    # if st.button("⚠️ Clear All Feedback", help="This will delete all collected feedback"):
-    #     st.session_state.feedback_data = []
-    #     st.success("All feedback cleared!")
-    #     st.rerun()
 
 else:
     st.info("No feedback collected yet. Start reviewing patents!")
