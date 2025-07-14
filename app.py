@@ -64,9 +64,9 @@ with col1:
     st.subheader("Description")
     st.write(row["description_text"])
 
-with col2:
-    st.subheader("Patent Info")
-    st.write(f"**Patent ID:** {row['patent_id']}")
+# with col2:
+#     st.subheader("Patent Info")
+#     st.write(f"**Patent ID:** {row['patent_id']}")
 
 st.subheader("Top Matched Industries")
 
